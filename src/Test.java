@@ -1,3 +1,6 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class Test {
 	
@@ -68,9 +71,6 @@ public class Test {
 			
 		
 		for (int i = 0; i < total.length; i++) {
-			System.out.println(total[i]);
-		}
-		for (int i = 0; i < total.length; i++) {
 			System.out.print(company[i] + " ");
 		}
 		System.out.println();
@@ -96,7 +96,6 @@ public class Test {
 				if(i == 0)
 				{
 					total[i][j] = (investment[i][j]/100)*(money[i]/2) + (money[i]/2); //INCREMENT OF FIRST MONTH. (HALF OF FIRST MONTH * FEE) + HALF OF FIRST MONTH. 
-					System.out.println(total[i][j]);
 				}
 				// OTHER MONTHS.
 				else 
@@ -120,31 +119,69 @@ public class Test {
 					// FIRST MONTH. 
 		}//FOR END.
 		
-		
-		for (int i = 0; i < total.length; i++) {
-			for (int j = 0; j < total.length; j++) {
-				System.out.print(total[i][j]+"  ");
-			}
-			System.out.println();
+		max  = 0;
+		for (int i = 0; i < total[0].length; i++) {
+				max = Math.max(max, total[total.length-1][i]);	
 		}
-		return 0;
+		return max + money[money.length-1]/2;
 	}
 	
-	public static void main(String[] args) {
-		double investment[][] = {{6,8,12,10,9,11}, {10,8,9,10,7,9}, {11,12,8,8,8,9},{12,6,8,9,7,10}, {10,7,9,8,11,11}};  // each company offers.
-		double demands [] = {9,8,5,4,7};						  // vehicle demands of each month.
-		double vehicleCost  = 100;							  // vehicle
-		double fee = 0.02;									  // tax rate.
+	public static void main(String[] args) throws NumberFormatException, IOException {
+		
+		
+		//int p = 6; 
+		//int d=6; 
+		int x= 25; 
+		double t = 2; 
+		int B=100;                         	// vehicle cost
+		int c = 5;
+		
+		
+		double demands [] = new double[x];						  // vehicle demands of each month.
+		double investment[][] = new double[x][c];				  // each company offers.
+		
+		
+		// READING DEMAND.
+		BufferedReader br = new BufferedReader(new FileReader("month_demand.txt"));
+		String st = br.readLine(); //to pass first line.
+		int count = 0;
+		String splitted[];
+		while ((st = br.readLine()) != null && count < x) {
+	            splitted = st.split("\t");
+	            demands[count] = Integer.parseInt(splitted[1]);
+	            count++;
+	    }
+	    br.close();
+	    
+	    //READING INVESTMENT
+	    br = new BufferedReader(new FileReader("investment.txt"));
+	    st = br.readLine(); //to pass first line.
+		count = 0;
+		st = null;
+		String temp[] = new String[c];
+		while ((st = br.readLine()) != null && count < x) {
+				temp = st.split("\t");
+	            for (int i = 1; i <= c; i++) {
+	            	investment[count][i-1] = Integer.parseInt(temp[i]);
+				}
+	            count++;
+	    }
+	    br.close();
+	    //
+	    //
+	    //
+		
+		double fee = t/100;									  // tax rate.
 		double money[] = new double [demands.length];					  // money for each month.
 		
 		for (int i = 0; i < money.length; i++) 				  // for loop (arranging money array)
 		{
-			money[i] = demands[i]*vehicleCost;
+			money[i] = demands[i]*B;
 		}
 															  // for loop end..
-		double lastMoney = Part2Greedy(investment,money,fee);
-		//System.out.println(lastMoney);
-		Part2Dynamic(investment,money,fee);
+		
+		System.out.println(Part2Greedy(investment,money,fee));
+		System.out.println(Part2Dynamic(investment,money,fee));
 	}
 
 }

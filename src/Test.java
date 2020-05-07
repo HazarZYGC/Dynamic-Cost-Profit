@@ -103,9 +103,11 @@ public class Test {
 					for (int k = 0; k < investment[0].length; k++) 
 					{
 						if(k==j)
+							//(HALF MONTH OF PREVIOUS MONTH + HALF OF CURRENT MONTH) * FEE + (HALF MONTH OF PREVIOUS MONTH + HALF OF CURRENT MONTH)
 							same = (total[i-1][j]+money[i]/2+money[i-1]/2)*(investment[i][j]/100)+(total[i-1][j]+money[i]/2+money[i-1]/2);
 						else
 						{
+							//(HALF MONTH OF PREVIOUS MONTH * TAX + HALF OF CURRENT MONTH) * FEE + (HALF MONTH OF PREVIOUS MONTH * TAX + HALF OF CURRENT MONTH)
 							different =(total[i-1][k]*percentage+money[i]/2+money[i-1]/2)*(investment[i][j]/100)+(total[i-1][k]*percentage+money[i]/2+money[i-1]/2);
 							max = Math.max(max, different);
 						}

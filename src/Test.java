@@ -128,33 +128,126 @@ public class Test {
 		return max + money[money.length-1]/2;
 	}
 	
+	
+	public static int Part1Dynamic(int p,int d,int[] demands,int[] garageCost)
+	{
+		int[][] minCost = new int[demands.length][garageCost.length];
+		int missing = 0;
+		int extra = 0;
+		int min = Integer.MAX_VALUE;
+		int intern = 0;
+		for (int i = 0; i < demands.length; i++) 
+		{
+			
+			for (int j = 0; j < garageCost.length; j++) 
+			{
+				if(i==0)
+					minCost[i][j] = garageCost[j];
+				else
+				{
+					if(demands[i]>=p)
+					{
+						missing = demands[i] - p;
+						extra = 0;
+					}
+					else
+					{
+						missing = 0;
+						extra = p - demands[i];
+					}
+					for (int k = 0; k < garageCost.length; k++) 
+					{
+						
+						if(missing !=0)
+						{
+							intern =  missing + j - k;
+							if(intern>=0)
+							{
+								min = Math.min(min, minCost[i-1][k]+garageCost[j]+d*intern);
+							}
+						}
+						else if(extra !=0)
+						{
+							intern = j - k -extra;
+							if(intern>=0)
+							{
+								min = Math.min(min, minCost[i-1][k]+garageCost[j]+d*intern);
+							}
+							else
+								min = Math.min(min, minCost[i-1][j]+garageCost[j]);
+						}
+						else
+						{
+							min = Math.min(min, minCost[i-1][j]+garageCost[j]);
+						}
+						
+					}
+					minCost[i][j] = min;
+					min = Integer.MAX_VALUE;
+				}
+			}
+		}
+		for (int i = 0; i < minCost.length; i++) {
+			for (int j = 0; j < minCost[0].length; j++) {
+				
+				System.out.print(minCost[i][j] + "  ");
+			}
+			System.out.println();
+		}
+		return 0;
+	}
+	
+	
 	public static void main(String[] args) throws NumberFormatException, IOException {
 		
 		
-		//int p = 6; 
-		//int d=6; 
-		int x= 25; 
+		int p = 6; 
+		int d=6; 
+		int x= 5; 
 		double t = 2; 
 		int B=100;                         	// vehicle cost
 		int c = 5;
-		
-		
+		int[] costDemand = new int[x+1];
 		double demands [] = new double[x];						  // vehicle demands of each month.
 		double investment[][] = new double[x][c];				  // each company offers.
+		int sum = 0;
 		
 		
 		// READING DEMAND.
-		BufferedReader br = new BufferedReader(new FileReader("month_demand.txt"));
+		BufferedReader  br = new BufferedReader(new FileReader("month_demand.txt"));
 		String st = br.readLine(); //to pass first line.
 		int count = 0;
-		String splitted[];
+	    String splitted[];
+		costDemand[0] = 0;
 		while ((st = br.readLine()) != null && count < x) {
 	            splitted = st.split("\t");
 	            demands[count] = Integer.parseInt(splitted[1]);
+	            costDemand[count+1] = Integer.parseInt(splitted[1]);
 	            count++;
 	    }
 	    br.close();
 	    
+	    for (int i = 0; i < costDemand.length; i++) {
+	    	sum += costDemand[i];
+
+	    }
+	    
+	    // GARAGE COST.
+	    int garageCost[] = new int[sum+1];
+	    garageCost[0] = 0;
+	    br = new BufferedReader(new FileReader("garage_cost.txt"));
+	    st = br.readLine(); //to pass first line.
+	    count = 1;
+	    while ((st = br.readLine()) != null && count <= sum) {
+	    	splitted = st.split("\t");
+	    	garageCost[count] = Integer.parseInt(splitted[1]);
+	    	count++;
+	    }
+	    br.close();
+	    /*   for (int i = 0; i < garageCost.length; i++) {
+			System.out.println(garageCost[i]);
+		}*/
+	    /*
 	    //READING INVESTMENT
 	    br = new BufferedReader(new FileReader("investment.txt"));
 	    st = br.readLine(); //to pass first line.
@@ -183,7 +276,8 @@ public class Test {
 															  // for loop end..
 		
 		System.out.println(Part2Greedy(investment,money,fee));
-		System.out.println(Part2Dynamic(investment,money,fee));
+		System.out.println(Part2Dynamic(investment,money,fee)); */
+	    Part1Dynamic(p,d,costDemand,garageCost);
 	}
 
 }

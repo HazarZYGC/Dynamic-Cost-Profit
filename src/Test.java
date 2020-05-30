@@ -4,11 +4,11 @@ import java.io.IOException;
 
 public class Test {
 	
-	public static double Part2Greedy(double investment[][],double money[],double fee)
+	public static int ProfitGreedy(double investment[][],double money[],double fee)
 	{
 		double percentage = 1-fee; //QUICK USAGE OF TAX
 		int company[] = new int [money.length]; //STORING LAST COMPANY INDEX.
-		double total[] = new double[money.length];  // TOTAL MONEY THAT BE WÝTHDRAWN FROM COMPANY.
+		double total[] = new double[money.length];  // TOTAL MONEY THAT BE WÄ°THDRAWN FROM COMPANY.
 		double max = 0;   //STORE MAX PROFIT.
 		double temp = 0;  //TEMP.
 		int colTemp = -1; // STORING CURRENT COMPANY INDEX.
@@ -45,7 +45,7 @@ public class Test {
 				// IF MAX PROFIT COMPANY INDEX IS NOT SAME AS PREVIOUS MONTH.
 				else 
 				{
-					//NEW MONEY AMOUNT, IF WE CHANGE THE COMPANY WÝTH PAYING TAX.
+					//NEW MONEY AMOUNT, IF WE CHANGE THE COMPANY WÄ°TH PAYING TAX.
 					//(HALF MONTH OF PREVIOUS MONTH * TAX + HALF OF CURRENT MONTH) * FEE + (HALF MONTH OF PREVIOUS MONTH * TAX + HALF OF CURRENT MONTH)
 					double different =(total[i-1]*percentage+money[i]/2+money[i-1]/2)*(max/100)+(total[i-1]*percentage+money[i]/2+money[i-1]/2);
 					//NEW MONEY AMOUNT, IF WE DONT CHANGE THE COMPANY.
@@ -68,21 +68,15 @@ public class Test {
 			max = 0; //REFRESH THE MAX VALUE FOR NEW TURN.
 		}//FOR END.
 		total[total.length-1]+=money[money.length-1]/2; // ADDING HALF OF LAST MONTH.
-			
 		
-		for (int i = 0; i < total.length; i++) {
-			System.out.print(company[i] + " ");
-		}
-		System.out.println();
-		
-		return total[total.length- 1];
+		return (int)total[total.length- 1];
 	}
 	
 	
-	public static double Part2Dynamic(double investment[][],double money[],double fee)
+	public static int ProfitDynamic(double investment[][],double money[],double fee)
 	{
 		double percentage = 1-fee; //QUICK USAGE OF TAX
-		double total[][] = new double[investment.length][investment[0].length];  // TOTAL MONEY THAT BE WÝTHDRAWN FROM COMPANY.
+		double total[][] = new double[investment.length][investment[0].length];  // TOTAL MONEY THAT BE WÄ°THDRAWN FROM COMPANY.
 		double max = 0;   //STORE MAX PROFIT.
 		double same = 0;
 		double different = 0;
@@ -108,7 +102,7 @@ public class Test {
 						else
 						{
 							//(HALF MONTH OF PREVIOUS MONTH * TAX + HALF OF CURRENT MONTH) * FEE + (HALF MONTH OF PREVIOUS MONTH * TAX + HALF OF CURRENT MONTH)
-							different =(total[i-1][k]*percentage+money[i]/2+money[i-1]/2)*(investment[i][j]/100)+(total[i-1][k]*percentage+money[i]/2+money[i-1]/2);
+							different =((total[i-1][k]*percentage)+money[i]/2+money[i-1]/2)*(investment[i][j]/100)+((total[i-1][k]*percentage)+money[i]/2+money[i-1]/2);
 							max = Math.max(max, different);
 						}
 					}
@@ -120,61 +114,62 @@ public class Test {
 			}//LOOP END.
 					// FIRST MONTH. 
 		}//FOR END.
-		
 		max  = 0;
 		for (int i = 0; i < total[0].length; i++) {
 				max = Math.max(max, total[total.length-1][i]);	
 		}
-		return max + money[money.length-1]/2;
+		max += money[money.length-1]/2;
+		
+		return (int) max;
 	}
 	
 	
-	public static int Part1Dynamic(int p,int d,int[] demands,int[] garageCost)
+	public static int CostDynamic(int p,int d,int[] demands,int[] garageCost)
 	{
-		int[][] minCost = new int[demands.length][garageCost.length];
-		int missing = 0;
-		int extra = 0;
-		int min = Integer.MAX_VALUE;
-		int intern = 0;
-		for (int i = 0; i < demands.length; i++) 
+		int[][] minCost = new int[demands.length][garageCost.length]; // STORING MIN COST FOR EACH MONTH.
+		int missing = 0;  // MISSING CAR AMOUNT FOR EACH MONTH.
+		int extra = 0;    // CAPACITY - DEMAND.
+		int min = Integer.MAX_VALUE; // TEMP VALUE.
+		int intern = 0;  // INTERN COUNTER.
+		
+		for (int i = 0; i < demands.length; i++)  // MONTH LOOP.
 		{
-			
-			for (int j = 0; j < garageCost.length; j++) 
+			for (int j = 0; j < garageCost.length; j++) //GARAGE COST LOOP.
 			{
 				if(i==0)
-					minCost[i][j] = garageCost[j];
+					minCost[i][j] = garageCost[j];   //IF WE START TO FIRST MONTH WITH CARS, FIRST WE MUST PAY THE GARAGE COST.
 				else
 				{
-					if(demands[i]>=p)
+					if(demands[i]>=p)   //IF DEMAND BIGGER THAN CAPACITY.
 					{
-						missing = demands[i] - p;
+						missing = demands[i] - p;  //DETERMINE MISSING VALUE AND EXTRA.
 						extra = 0;
 					}
-					else
+					else  //IF CAPACITY BIGGER THAN DEMAND.
 					{
 						missing = 0;
 						extra = p - demands[i];
 					}
-					for (int k = 0; k < garageCost.length; k++) 
+					for (int k = 0; k < garageCost.length; k++) //SECOND GARAGE LOOP TO DETERMINE BEST WAY.
 					{
 						
-						if(missing !=0)
+						if(missing !=0) //IF THERE IS A MISSING.
 						{
-							intern =  missing + j - k;
+							intern =  missing + j - k; //DETERMINING INTERN (MISSING + NEEDED CAR AFTER DEMAND - STORED CAR)
 							if(intern>=0)
 							{
-								min = Math.min(min, minCost[i-1][k]+garageCost[j]+d*intern);
+								min = Math.min(min, minCost[i-1][k]+garageCost[j]+d*intern); // CALCULATE NEW COST FOR THIS MONTH 
 							}
 						}
-						else if(extra !=0)
+						else if(extra !=0) // IF THERE ARE EXTRA CAPACITY.
 						{
-							intern = j - k -extra;
+							intern = j - k -extra; // DETERMINING INTERN (NEEDED CAR AFTER DEMAND  - STORED CAR - EXTRA CARS. )
 							if(intern>=0)
 							{
-								min = Math.min(min, minCost[i-1][k]+garageCost[j]+d*intern);
+								min = Math.min(min, minCost[i-1][k]+garageCost[j]+d*intern); // CALCULATE NEW COST FOR THIS MONTH 
 							}
 							else
-								min = Math.min(min, minCost[i-1][j]+garageCost[j]);
+								min = Math.min(min, minCost[i-1][j]+garageCost[j]); // CALCULATE NEW COST FOR THIS MONTH 
 						}
 						else
 						{
@@ -187,30 +182,47 @@ public class Test {
 				}
 			}
 		}
-		for (int i = 0; i < minCost.length; i++) {
+			min =  Integer.MAX_VALUE;
 			for (int j = 0; j < minCost[0].length; j++) {
 				
-				System.out.print(minCost[i][j] + "  ");
+				min = Math.min(min, minCost[minCost.length-1][j]);
 			}
-			System.out.println();
-		}
-		return 0;
+		
+			return min;
+		
 	}
 	
+	
+	public static int CostGreedy(int p,int d,int[] demands)
+	{
+		// JUST USING INTERNS TO PROVIDE DAMENDED CARS.
+		// THERE CAN BE ONE MORE SOLUTION :
+		// 						JUST FOR FIRST MONTH WE CAN USE GARAGE. IT MIGHT MAKE DIFFERENCE A BIT.
+		// 						IN THIS CODE I DO NOT USE GARAGE COST.
+		int cost = 0;
+		for (int i = 0; i < demands.length; i++) 
+		{
+			int missing = demands[i] - p;
+			if(missing > 0)
+				cost += missing * d; 
+		}
+		return cost;
+	}
 	
 	public static void main(String[] args) throws NumberFormatException, IOException {
 		
 		
-		int p = 6; 
-		int d=6; 
-		int x= 5; 
+		int p = 5; 
+		int d = 5; 
+		int x = 3; 
 		double t = 2; 
-		int B=100;                         	// vehicle cost
-		int c = 5;
-		int[] costDemand = new int[x+1];
-		double demands [] = new double[x];						  // vehicle demands of each month.
+		int B = 100;                         	// vehicle cost
+		int c = 3;
+		
+		int[] costDemand = new int[x+1];						   //	vehicle demands of each month. (Part 1)
+		double demands [] = new double[x];						  // vehicle demands of each month.  (Part 2)
 		double investment[][] = new double[x][c];				  // each company offers.
-		int sum = 0;
+		int sum = 0;  											 // sum of total car demand.
 		
 		
 		// READING DEMAND.
@@ -244,10 +256,7 @@ public class Test {
 	    	count++;
 	    }
 	    br.close();
-	    /*   for (int i = 0; i < garageCost.length; i++) {
-			System.out.println(garageCost[i]);
-		}*/
-	    /*
+	    
 	    //READING INVESTMENT
 	    br = new BufferedReader(new FileReader("investment.txt"));
 	    st = br.readLine(); //to pass first line.
@@ -267,7 +276,7 @@ public class Test {
 	    //
 		
 		double fee = t/100;									  // tax rate.
-		double money[] = new double [demands.length];					  // money for each month.
+		double money[] = new double [demands.length];			// money for each month.
 		
 		for (int i = 0; i < money.length; i++) 				  // for loop (arranging money array)
 		{
@@ -275,9 +284,11 @@ public class Test {
 		}
 															  // for loop end..
 		
-		System.out.println(Part2Greedy(investment,money,fee));
-		System.out.println(Part2Dynamic(investment,money,fee)); */
-	    Part1Dynamic(p,d,costDemand,garageCost);
+		System.out.println("DP Cost = " + CostDynamic(p,d,costDemand,garageCost));
+		System.out.println("DP Profit = " + ProfitDynamic(investment,money,fee));
+		System.out.println("--------------------------");
+		System.out.println("Greedy Cost = " + CostGreedy(p,d,costDemand));
+	    System.out.println("Greedy Profit = " + ProfitGreedy(investment,money,fee));
 	}
 
 }
